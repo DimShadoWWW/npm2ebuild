@@ -130,8 +130,7 @@ class NpmPkg(object):
         self.downloadInfo()
         self.loadVersions()
         self.lastversiondeps=""
-        print self.name 
-        print self.lastversion
+        print "%s-%s" % (self.name, self.lastversion)
         if u"dependencies" in self.pkgjson[u'versions'][self.lastversion].keys():
             for n in self.pkgjson[u'versions'][self.lastversion][u"dependencies"].keys():
                 d = self.pkgjson[u'versions'][self.lastversion][u"dependencies"][n].replace("~", "").replace("=", "").replace(">", "").replace("<", "")
@@ -154,11 +153,12 @@ class NpmPkg(object):
 
     """Make ebuild file"""
     def makeEbuild(self):
-        print os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion))
         if not os.path.exists(os.path.join("dev-nodejs",self.pkgjson[u'name'])):
             os.makedirs(os.path.join("dev-nodejs",self.pkgjson[u'name']))
-        with open(os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion)), "w") as f:
-            f.write("""
+        if not os.path.exists(os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion))):
+            print os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion))
+            with open(os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion)), "w") as f:
+                f.write("""
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
@@ -177,10 +177,10 @@ IUSE=""
 DEPEND=""
 RDEPEND=">=net-libs/nodejs-0.8.10
 %s${DEPEND}"
-                """ % (
-                    self.pkgjson[u'description'].replace("`", "'"),
-                    self.lastversiondeps
-                    ))
+""" % (
+                        self.pkgjson[u'description'].replace("`", "'"),
+                        self.lastversiondeps
+                        ))
 
     """Download file"""
     def downloadPkg(self):
