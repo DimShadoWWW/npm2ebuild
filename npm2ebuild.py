@@ -198,7 +198,7 @@ RDEPEND=">=net-libs/nodejs-0.8.10
     def loadVersions(self):
         self.versions = self.pkgjson[u'versions'].keys()
         # vers = [tuple([int(x) for x in n.split(u'.')]) for n in self.versions]
-        vers = sorted(self.versions, key=lambda v: NumberedVersion(v, '.', ['-rc', '-beta', '-alpha']))
+        vers = sorted(self.versions, key=lambda v: NumberedVersion(v, '.', ['-rc', '-beta', '-alpha', '-']))
         # print vers
         self.lastversion =  vers[-1]
         # self.lastversion = ".".join([ str(i) for i in vers[-1]])
