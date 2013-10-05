@@ -156,8 +156,15 @@ class NpmPkg(object):
         if not os.path.exists(os.path.join("dev-nodejs",self.pkgjson[u'name'])):
             os.makedirs(os.path.join("dev-nodejs",self.pkgjson[u'name']))
         if not os.path.exists(os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion))):
-            print os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion))
-            with open(os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion)), "w") as f:
+            version_adjust=''
+            if re.sub("-[0-9]+$", '', self.lastversion) == self.lastversion:
+                version_adjust="""
+MY_PV="%s"
+SRC_URI="http://registry.npmjs.org/${PN}/-/${PN}-${MY_PV}.tgz"
+S="${WORKDIR}/${PN}-${MY_PV}"
+                """ % (self.lastversion)
+            print os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], re.sub("-[0-9]+$", '', self.lastversion)))
+            with open(os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], re.sub("-[0-9]+$", '', self.lastversion))), "w") as f:
                 f.write("""
 # Copyright 1999-2013 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
@@ -168,6 +175,7 @@ EAPI=5
 inherit npm
 
 DESCRIPTION="%s"
+%s
 
 LICENSE="MIT"
 SLOT="0"
@@ -179,6 +187,7 @@ RDEPEND=">=net-libs/nodejs-0.8.10
 %s${DEPEND}"
 """ % (
                         self.pkgjson[u'description'].replace("`", "'"),
+                        version_adjust,
                         self.lastversiondeps
                         ))
 
