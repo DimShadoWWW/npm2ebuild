@@ -135,10 +135,12 @@ class NpmPkg(object):
             for n in self.pkgjson[u'versions'][self.lastversion][u"dependencies"].keys():
                 d = self.pkgjson[u'versions'][self.lastversion][u"dependencies"][n].replace("~", "").replace("=", "").replace(">", "").replace("<", "")
                 self.checkDependencies(n, d)
-                if d == "*":
+                fixedversion=re.sub(" ", '', re.sub("-[0-9]+$", '', d))
+                #    name-*    name         name-3.x
+                if d == "*" or d == '' or re.search('x', d):
                     self.lastversiondeps = "%s       dev-nodejs/%s\n" % (self.lastversiondeps, n)
                 else:
-                    self.lastversiondeps = "%s       >=dev-nodejs/%s-%s\n" % (self.lastversiondeps, n, d)
+                    self.lastversiondeps = "%s       >=dev-nodejs/%s-%s\n" % (self.lastversiondeps, n, fixedversion)
         self.makeEbuild()
         # for k in self.versions:
         #     for n in self.pkgjson[u'versions'][k][u"dependencies"].keys():
@@ -162,7 +164,7 @@ class NpmPkg(object):
 MY_PV="%s"
 SRC_URI="http://registry.npmjs.org/${PN}/-/${PN}-${MY_PV}.tgz"
 S="${WORKDIR}/${PN}-${MY_PV}"
-                """ % (self.lastversion)
+""" % (self.lastversion)
             print os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], re.sub("-[0-9]+$", '', self.lastversion)))
             with open(os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], re.sub("-[0-9]+$", '', self.lastversion))), "w") as f:
                 f.write("""
