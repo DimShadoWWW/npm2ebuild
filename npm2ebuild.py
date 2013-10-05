@@ -157,7 +157,7 @@ class NpmPkg(object):
             os.makedirs(os.path.join("dev-nodejs",self.pkgjson[u'name']))
         if not os.path.exists(os.path.join("dev-nodejs",self.pkgjson[u'name'], "%s-%s.ebuild" % (self.pkgjson[u'name'], self.lastversion))):
             version_adjust=''
-            if re.sub("-[0-9]+$", '', self.lastversion) == self.lastversion:
+            if re.sub("-[0-9]+$", '', self.lastversion) != self.lastversion:
                 version_adjust="""
 MY_PV="%s"
 SRC_URI="http://registry.npmjs.org/${PN}/-/${PN}-${MY_PV}.tgz"
